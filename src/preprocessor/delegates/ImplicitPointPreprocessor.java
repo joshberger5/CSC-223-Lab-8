@@ -28,7 +28,7 @@ public class ImplicitPointPreprocessor
         	for(int j=i+1; j<givenSegments.size(); j++) {
         		Point intersect = IntersectionDelegate.segmentIntersection(	givenSegments.get(i),
         																	givenSegments.get(j));
-        		if(intersect != null) {
+        		if(intersect != null && givenPoints.getPoint(intersect) == null) {
         			implicitPoints.add(intersect);
         		}
             }

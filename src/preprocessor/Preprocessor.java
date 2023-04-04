@@ -67,19 +67,19 @@ public class Preprocessor
 		//
 		// Implicit Segments attributed to implicit points
 		//
-		_implicitSegments = computeImplicitBaseSegments(_implicitPoints);
+		_implicitSegments = computeImplicitBaseSegments(); //implicit points
 
 		//
 		// Combine the given minimal segments and implicit segments into a true set of minimal segments
 		//     *givenSegments may not be minimal
 		//     * implicitSegmen
 		//
-		_allMinimalSegments = identifyAllMinimalSegments(_implicitPoints, _givenSegments, _implicitSegments);
+		_allMinimalSegments = identifyAllMinimalSegments(); //implicit points, segments | given segments
 
 		//
 		// Construct all segments inductively from the base segments
 		//
-		_nonMinimalSegments = constructAllNonMinimalSegments(_allMinimalSegments);
+		_nonMinimalSegments = constructAllNonMinimalSegments(); // all minimal segments
 
 		//
 		// Combine minimal and non-minimal into one package: our database
@@ -88,19 +88,18 @@ public class Preprocessor
 		_nonMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
 	}
 
-	private Set<Segment> computeImplicitBaseSegments(Set<Point> _implicitPoints2) {
+	private Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 
-	private Set<Segment> identifyAllMinimalSegments(Set<Point> _implicitPoints2, Set<Segment> _givenSegments2,
-			Set<Segment> _implicitSegments2) {
+	private Set<Segment> identifyAllMinimalSegments(Set<Point> implicitPoints, Set<Segment> givenSegments, Set<Segment> implicitSegments) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	private Set<Segment> constructAllNonMinimalSegments(Set<Segment> _allMinimalSegments2) {
+	private Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
 		// TODO Auto-generated method stub
 		return null;
 	}
