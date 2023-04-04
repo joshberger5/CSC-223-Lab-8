@@ -90,6 +90,17 @@ public class Preprocessor
 
 	private Set<Segment> computeImplicitBaseSegments() {
 		// TODO Auto-generated method stub
+		
+		for(Point point: _implicitPoints) {
+			for(Segment segment : _givenSegments) {
+				if(segment.pointLiesBetweenEndpoints(point)) {
+					
+				}
+			}
+		}
+		// for every implicit point check every segment if on and if so
+		// produce 2 implicit segments off of the original 
+		
 		return null;
 	}
 	
