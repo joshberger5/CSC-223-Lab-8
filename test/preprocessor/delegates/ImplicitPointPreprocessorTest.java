@@ -27,8 +27,8 @@ public class ImplicitPointPreprocessorTest {
 	
 	@Test
 	void compute_nonIntersecting_test() {
-		Point a = new Point("A", 0, 0);
-		Point b = new Point("B", 1, 0);
+		Point a = new Point("A", 0, 0); // C —— D
+		Point b = new Point("B", 1, 0); // A —— B
 		Point c = new Point("C", 0, 1);
 		Point d = new Point("D", 1, 1);
 		List<Point> pointInput = Arrays.asList(new Point[]{a, b, c, d});
@@ -44,9 +44,9 @@ public class ImplicitPointPreprocessorTest {
 	
 	@Test
 	void compute_midIntersecting_test() {
-		Point a = new Point("A", 0, 0);
-		Point b = new Point("B", 1, 0);
-		Point c = new Point("C", 0, 1);
+		Point a = new Point("A", 0, 0); //  C   D
+		Point b = new Point("B", 1, 0); // 	  X
+		Point c = new Point("C", 0, 1); //  A   B
 		Point d = new Point("D", 1, 1);
 		List<Point> pointInput = Arrays.asList(new Point[]{a, b, c, d});
 		PointDatabase points = new PointDatabase(pointInput);
@@ -61,9 +61,9 @@ public class ImplicitPointPreprocessorTest {
 	
 	@Test
 	void compute_endIntersecting_test() {
-		Point a = new Point("A", 0, 0);
-		Point b = new Point("B", 1, 0);
-		Point c = new Point("C", 0, 1);
+		Point a = new Point("A", 0, 0); //  C
+		Point b = new Point("B", 1, 0); //  |
+		Point c = new Point("C", 0, 1); //  A —— B
 		List<Point> pointInput = Arrays.asList(new Point[]{a, b, c});
 		PointDatabase points = new PointDatabase(pointInput);
 		
