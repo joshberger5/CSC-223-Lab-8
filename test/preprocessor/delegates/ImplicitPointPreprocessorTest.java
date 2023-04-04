@@ -56,7 +56,7 @@ public class ImplicitPointPreprocessorTest {
 		List<Segment> segments = Arrays.asList(new Segment[] {ad, bc});
 		Set<Point> implicitPoints = ImplicitPointPreprocessor.compute(points, segments);
 		
-		assertFalse(implicitPoints.isEmpty());
+		assertEquals("[*_A(0.5, 0.5)]", implicitPoints.toString());
 	}
 	
 	@Test

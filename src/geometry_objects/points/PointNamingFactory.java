@@ -169,7 +169,7 @@ public class PointNamingFactory
 	 */
 	public String getCurrentName() // Jake
 	{
-        String currName = _PREFIX + _currentName;
+        String currName = _PREFIX + _currentName.repeat(_numLetters);
         updateName();
         return currName;
 	}
