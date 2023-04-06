@@ -94,24 +94,39 @@ public class Preprocessor
 		for(Point point: _implicitPoints) {
 			for(Segment segment : _givenSegments) {
 				if(segment.pointLiesBetweenEndpoints(point)) {
-					
+					_implicitSegments.add(new Segment(segment.getPoint1(), point));
+					_implicitSegments.add(new Segment(point, segment.getPoint2()));
 				}
 			}
 		}
 		// for every implicit point check every segment if on and if so
 		// produce 2 implicit segments off of the original 
 		
-		return null;
+		return _implicitSegments;
 	}
 	
 
 	private Set<Segment> identifyAllMinimalSegments() {
-		// TODO Auto-generated method stub
-		return null;
+		for (Segment segment : _givenSegments) {
+			boolean minimal = true;
+			for (Point point : _implicitPoints) {
+				if (segment.pointLiesBetweenEndpoints(point)) {
+					minimal = false;
+					break;
+				}
+			}
+			if (minimal) _allMinimalSegments.add(segment);
+		}
+		for (Segment segment: _implicitSegments) {
+			_allMinimalSegments.add(segment);
+		}
+		return _allMinimalSegments;
 	}
 	
 	private Set<Segment> constructAllNonMinimalSegments() {
-		// TODO Auto-generated method stub
-		return null;
+		for (Segment segment: _givenSegments) {
+			if (!_allMinimalSegments.contains(segment)) _nonMinimalSegments.add(segment);
+		}
+		return _nonMinimalSegments;
 	}
 }
