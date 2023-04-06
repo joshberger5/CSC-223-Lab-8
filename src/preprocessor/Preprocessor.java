@@ -1,5 +1,6 @@
 package preprocessor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -132,6 +133,24 @@ public class Preprocessor
 //		return implicitSegments;
 	}
 	
+	private List<Point> LexicographicSort(Set<Point> points) {
+		List<Point> sortedPoints = new ArrayList<Point>();
+		for(Point point: points) {
+			sortedPoints.add(point);
+			for(int i=sortedPoints.size()-1; Point.LexicographicOrdering(sortedPoints.get(i), point) == 0; i--) {
+				swapBackOne(i, sortedPoints);
+			}
+		}
+		return null;
+	}
+	
+	private void swapBackOne(int i, List<Point> sortedPoints) {
+		if(i == 0) return;
+		Point temp = sortedPoints.get(i-1);
+		sortedPoints.set(i-1, sortedPoints.get(i));
+		sortedPoints.set(i, temp);
+	}
+
 	/**
 	 * finds the set of all minimal segments
 	 * @param implicitPoints
