@@ -78,6 +78,11 @@ public class Preprocessor
 		_nonMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
 	}
 
+	/**
+	 * computes the set of all implicit segments
+	 * @param implicitPoints
+	 * @return the set of implicit segments
+	 */
 	protected Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
 		for(Segment segment: _givenSegments) {
 			computeImplicitSegmentBreakIfExists(segment, implicitPoints);
@@ -86,19 +91,39 @@ public class Preprocessor
 		return _implicitSegments;
 	}
 
+	/**
+	 * finds and splits a given segment on an overlapping point if one exists
+	 * @param segment
+	 * @param implicitPoints
+	 */
 	private void computeImplicitSegmentBreakIfExists(Segment segment, Set<Point> implicitPoints) {
 		for(Point point : implicitPoints) {
 			if(segment.pointLiesBetweenEndpoints(point)) {
-				_implicitSegments.add(new Segment(segment.getPoint1(), point));
-				_implicitSegments.add(new Segment(point, segment.getPoint2()));
+				breakSegmentOnPoint(segment, point);
 			}
 		}
 	}
-	
 
+	/**
+	 * splits a specified segment on a specified point and adds to the implicit segments
+	 * @param segment
+	 * @param point
+	 */
+	private void breakSegmentOnPoint(Segment segment, Point point) {
+		_implicitSegments.add(new Segment(segment.getPoint1(), point));
+		_implicitSegments.add(new Segment(point, segment.getPoint2()));
+	}
+	
+	/**
+	 * finds the set of all minimal segments
+	 * @param implicitPoints
+	 * @param givenSegments
+	 * @param implicitSegments
+	 * @return the set of all minimal segments
+	 */
 	protected Set<Segment> identifyAllMinimalSegments(Set<Point> implicitPoints, Set<Segment> givenSegments, Set<Segment> implicitSegments) {
 		for (Segment segment : givenSegments) {
-			if (isMinimal(implicitPoints, segment)) {
+			if (isMinimal(segment, implicitPoints)) {
 				_allMinimalSegments.add(segment);
 			}
 		}
@@ -106,7 +131,13 @@ public class Preprocessor
 		return _allMinimalSegments;
 	}
 
-	private boolean isMinimal(Set<Point> implicitPoints, Segment segment) {
+	/**
+	 * determines whether is segment has a point that lies between its end points
+	 * @param segment
+	 * @param implicitPoints
+	 * @return whether the segment is minimal
+	 */
+	private boolean isMinimal(Segment segment, Set<Point> implicitPoints) {
 		for (Point point : implicitPoints) {
 			if (segment.pointLiesBetweenEndpoints(point)) {
 				return false;
@@ -115,6 +146,11 @@ public class Preprocessor
 		return true;
 	}
 	
+	/**
+	 * Constructs the set of non-minimal segments
+	 * @param allMinimalSegments
+	 * @return set of non-minimal segments
+	 */
 	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
 		for (Segment segment: _givenSegments) {
 			if (!allMinimalSegments.contains(segment)) {
