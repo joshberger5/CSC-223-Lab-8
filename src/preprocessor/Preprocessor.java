@@ -121,7 +121,7 @@ public class Preprocessor
 	 * @return set of two broken down segments
 	 */
 	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
-		//<-->   <--(-[-)--]->  ==> /--/-/-/--/- 
+		//<-->   <--(-[-)--]->  ==>  /--/-/-/--/-/
 		//
 		//         +  (  [             +  (  [
 		//<-->   <-|--|--|->    ==>  /-/--/--/-/
