@@ -59,73 +59,67 @@ public class Preprocessor
 	 */
 	public void analyze()
 	{
-		//
 		// Implicit Points
-		//
 		_implicitPoints = ImplicitPointPreprocessor.compute(_pointDatabase, _givenSegments.stream().toList());
 
-		//
 		// Implicit Segments attributed to implicit points
-		//
-		_implicitSegments = computeImplicitBaseSegments(); //implicit points
+		_implicitSegments = computeImplicitBaseSegments(_implicitPoints);
 
-		//
 		// Combine the given minimal segments and implicit segments into a true set of minimal segments
 		//     *givenSegments may not be minimal
 		//     * implicitSegmen
-		//
-		_allMinimalSegments = identifyAllMinimalSegments(); //implicit points, segments | given segments
+		_allMinimalSegments = identifyAllMinimalSegments(_implicitPoints, _givenSegments, _implicitSegments);
 
-		//
 		// Construct all segments inductively from the base segments
-		//
-		_nonMinimalSegments = constructAllNonMinimalSegments(); // all minimal segments
+		_nonMinimalSegments = constructAllNonMinimalSegments(_allMinimalSegments);
 
-		//
 		// Combine minimal and non-minimal into one package: our database
-		//
 		_allMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
 		_nonMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
 	}
 
-	private Set<Segment> computeImplicitBaseSegments() {
-		// TODO Auto-generated method stub
-		
-		for(Point point: _implicitPoints) {
-			for(Segment segment : _givenSegments) {
-				if(segment.pointLiesBetweenEndpoints(point)) {
-					_implicitSegments.add(new Segment(segment.getPoint1(), point));
-					_implicitSegments.add(new Segment(point, segment.getPoint2()));
-				}
-			}
+	protected Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
+		for(Segment segment: _givenSegments) {
+			computeImplicitSegmentBreakIfExists(segment, implicitPoints);
 		}
-		// for every implicit point check every segment if on and if so
-		// produce 2 implicit segments off of the original 
 		
 		return _implicitSegments;
 	}
-	
 
-	private Set<Segment> identifyAllMinimalSegments() {
-		for (Segment segment : _givenSegments) {
-			boolean minimal = true;
-			for (Point point : _implicitPoints) {
-				if (segment.pointLiesBetweenEndpoints(point)) {
-					minimal = false;
-					break;
-				}
+	private void computeImplicitSegmentBreakIfExists(Segment segment, Set<Point> implicitPoints) {
+		for(Point point : implicitPoints) {
+			if(segment.pointLiesBetweenEndpoints(point)) {
+				_implicitSegments.add(new Segment(segment.getPoint1(), point));
+				_implicitSegments.add(new Segment(point, segment.getPoint2()));
 			}
-			if (minimal) _allMinimalSegments.add(segment);
 		}
-		for (Segment segment: _implicitSegments) {
-			_allMinimalSegments.add(segment);
-		}
-		return _allMinimalSegments;
 	}
 	
-	private Set<Segment> constructAllNonMinimalSegments() {
+
+	protected Set<Segment> identifyAllMinimalSegments(Set<Point> implicitPoints, Set<Segment> givenSegments, Set<Segment> implicitSegments) {
+		for (Segment segment : givenSegments) {
+			if (isMinimal(implicitPoints, segment)) {
+				_allMinimalSegments.add(segment);
+			}
+		}
+		_allMinimalSegments.addAll(_implicitSegments);
+		return _allMinimalSegments;
+	}
+
+	private boolean isMinimal(Set<Point> implicitPoints, Segment segment) {
+		for (Point point : implicitPoints) {
+			if (segment.pointLiesBetweenEndpoints(point)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
 		for (Segment segment: _givenSegments) {
-			if (!_allMinimalSegments.contains(segment)) _nonMinimalSegments.add(segment);
+			if (!allMinimalSegments.contains(segment)) {
+				_nonMinimalSegments.add(segment);
+			}
 		}
 		return _nonMinimalSegments;
 	}
