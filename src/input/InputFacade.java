@@ -19,6 +19,7 @@ import input.components.FigureNode;
 import input.components.point.PointNode;
 import input.components.segment.SegmentNode;
 import input.parser.JSONParser;
+import utilities.io.FileUtilities;
 
 public class InputFacade
 {
@@ -34,8 +35,8 @@ public class InputFacade
 	public static FigureNode extractFigure(String filepath)
 	{
         JSONParser parser = new JSONParser(new GeometryBuilder());
-        
-        return (FigureNode) parser.parse(filepath);
+        String str = FileUtilities.readFileFilterComments(filepath);
+        return (FigureNode) parser.parse(str);
 	}
 
 	/**

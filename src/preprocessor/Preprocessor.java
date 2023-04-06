@@ -49,6 +49,11 @@ public class Preprocessor
 		_pointDatabase  = points;
 		_givenSegments = segments;
 		
+		_implicitPoints = new LinkedHashSet<Point>();
+		_implicitSegments = new LinkedHashSet<Segment>();
+		_allMinimalSegments = new LinkedHashSet<Segment>();
+		_nonMinimalSegments = new LinkedHashSet<Segment>();
+		
 		_segmentDatabase = new HashMap<Segment, Segment>();
 		
 		analyze();
