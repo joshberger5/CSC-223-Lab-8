@@ -89,34 +89,47 @@ public class Preprocessor
 	 * @return the set of implicit segments
 	 */
 	protected Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
+		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
 		for(Segment segment: _givenSegments) {
-			computeImplicitSegmentBreakIfExists(segment, implicitPoints);
+			implicitSegments.addAll(computeImplicitSegmentBreaksIfExists(segment, implicitPoints));
 		}
-		
-		return _implicitSegments;
+		return implicitSegments;
 	}
 
 	/**
 	 * finds and splits a given segment on an overlapping point if one exists
 	 * @param segment
 	 * @param implicitPoints
+	 * @return set from broken down segment
 	 */
-	private void computeImplicitSegmentBreakIfExists(Segment segment, Set<Point> implicitPoints) {
+	private Set<Segment> computeImplicitSegmentBreaksIfExists(Segment segment, Set<Point> implicitPoints) {
+		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+		Set<Point> midPoints = new LinkedHashSet<Point>();
 		for(Point point : implicitPoints) {
 			if(segment.pointLiesBetweenEndpoints(point)) {
-				breakSegmentOnPoint(segment, point);
+				midPoints.add(point);
 			}
 		}
+		implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
+		return implicitSegments;
 	}
 
 	/**
 	 * splits a specified segment on a specified point and adds to the implicit segments
 	 * @param segment
-	 * @param point
+	 * @param midPoints
+	 * @return set of two broken down segments
 	 */
-	private void breakSegmentOnPoint(Segment segment, Point point) {
-		_implicitSegments.add(new Segment(segment.getPoint1(), point));
-		_implicitSegments.add(new Segment(point, segment.getPoint2()));
+	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
+		//<-->   <--(-[-)--]->  ==> /--/-/-/--/- 
+		//
+		//         +  (  [           +  (  [
+		//<-->   <-|--|--|->    ==>  /-/--/--/-/
+		//         ?  )  ]           ?  )  ]
+//		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+//		implicitSegments.add(new Segment(segment.getPoint1(), midPoints));
+//		implicitSegments.add(new Segment(midPoints, segment.getPoint2()));
+//		return implicitSegments;
 	}
 	
 	/**
@@ -127,13 +140,14 @@ public class Preprocessor
 	 * @return the set of all minimal segments
 	 */
 	protected Set<Segment> identifyAllMinimalSegments(Set<Point> implicitPoints, Set<Segment> givenSegments, Set<Segment> implicitSegments) {
+		Set<Segment> allMinimalSegments = new LinkedHashSet<Segment>();
 		for (Segment segment : givenSegments) {
 			if (isMinimal(segment, implicitPoints)) {
-				_allMinimalSegments.add(segment);
+				allMinimalSegments.add(segment);
 			}
 		}
-		_allMinimalSegments.addAll(_implicitSegments);
-		return _allMinimalSegments;
+		allMinimalSegments.addAll(_implicitSegments);
+		return allMinimalSegments;
 	}
 
 	/**
@@ -157,11 +171,12 @@ public class Preprocessor
 	 * @return set of non-minimal segments
 	 */
 	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
+		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
 		for (Segment segment: _givenSegments) {
 			if (!allMinimalSegments.contains(segment)) {
-				_nonMinimalSegments.add(segment);
+				nonMinimalSegments.add(segment);
 			}
 		}
-		return _nonMinimalSegments;
+		return nonMinimalSegments;
 	}
 }
