@@ -123,9 +123,9 @@ public class Preprocessor
 	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
 		//<-->   <--(-[-)--]->  ==> /--/-/-/--/- 
 		//
-		//         +  (  [           +  (  [
+		//         +  (  [             +  (  [
 		//<-->   <-|--|--|->    ==>  /-/--/--/-/
-		//         ?  )  ]           ?  )  ]
+		//         ?  )  ]             ?  )  ]
 //		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
 //		implicitSegments.add(new Segment(segment.getPoint1(), midPoints));
 //		implicitSegments.add(new Segment(midPoints, segment.getPoint2()));
