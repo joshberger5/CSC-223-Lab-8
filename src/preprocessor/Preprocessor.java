@@ -1,6 +1,7 @@
 package preprocessor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -48,6 +49,7 @@ public class Preprocessor
 	public Preprocessor(PointDatabase points, Set<Segment> segments)
 	{
 		_pointDatabase  = points;
+		
 		_givenSegments = segments;
 		
 		_implicitPoints = new LinkedHashSet<Point>();
@@ -125,39 +127,16 @@ public class Preprocessor
 	 */
 	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
 		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
-		List<Point> points = LexicographicSort(midPoints);
-		if(segment.getPoint1().compareTo(segment.getPoint2()) <= 0) {
-			points.add(0, segment.getPoint1());
-			points.add(segment.getPoint2());
-		}
-		else {
-			points.add(0, segment.getPoint2());
-			points.add(segment.getPoint1());
-		}
+		List<Point> points = new ArrayList<Point>(midPoints);
+		points.add(segment.getPoint1());
+		points.add(segment.getPoint2());
+		points.sort(Comparator.naturalOrder());
 		
 		for(int i=0; i<points.size()-1; i++) {
 			implicitSegments.add(new Segment(points.get(i), points.get(i+1)));
 		}
 		
 		return implicitSegments;
-	}
-	
-	private List<Point> LexicographicSort(Set<Point> points) {
-		List<Point> sortedPoints = new ArrayList<Point>();
-		for(Point point: points) {
-			int index = findCorrectIndex(point, sortedPoints);
-			sortedPoints.add(index, point);
-		}
-		return sortedPoints;
-	}
-	
-	private int findCorrectIndex(Point point, List<Point> sortedPoints) {
-		for(int i=0; i<sortedPoints.size(); i++) {
-			if(point.compareTo(sortedPoints.get(i)) <= 0) {
-				return i;
-			}
-		}
-		return 0;
 	}
 
 	/**
