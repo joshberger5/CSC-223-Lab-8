@@ -67,7 +67,7 @@ public class Preprocessor
 	{
 		// Implicit Points
 		_implicitPoints = ImplicitPointPreprocessor.compute(_pointDatabase, _givenSegments.stream().toList());
-
+		
 		// Implicit Segments attributed to implicit points
 		_implicitSegments = computeImplicitBaseSegments(_implicitPoints);
 
@@ -111,7 +111,9 @@ public class Preprocessor
 				midPoints.add(point);
 			}
 		}
-		implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
+		if(midPoints.size() != 0) {
+			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
+		}
 		return implicitSegments;
 	}
 
@@ -122,33 +124,40 @@ public class Preprocessor
 	 * @return set of two broken down segments
 	 */
 	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
-		//<-->   <--(-[-)--]->  ==>  /--/-/-/--/-/
-		//
-		//         +  (  [             +  (  [
-		//<-->   <-|--|--|->    ==>  /-/--/--/-/
-		//         ?  )  ]             ?  )  ]
-//		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
-//		implicitSegments.add(new Segment(segment.getPoint1(), midPoints));
-//		implicitSegments.add(new Segment(midPoints, segment.getPoint2()));
-//		return implicitSegments;
+		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+		List<Point> points = LexicographicSort(midPoints);
+		if(segment.getPoint1().compareTo(segment.getPoint2()) <= 0) {
+			points.add(0, segment.getPoint1());
+			points.add(segment.getPoint2());
+		}
+		else {
+			points.add(0, segment.getPoint2());
+			points.add(segment.getPoint1());
+		}
+		
+		for(int i=0; i<points.size()-1; i++) {
+			implicitSegments.add(new Segment(points.get(i), points.get(i+1)));
+		}
+		
+		return implicitSegments;
 	}
 	
 	private List<Point> LexicographicSort(Set<Point> points) {
 		List<Point> sortedPoints = new ArrayList<Point>();
 		for(Point point: points) {
-			sortedPoints.add(point);
-			for(int i=sortedPoints.size()-1; Point.LexicographicOrdering(sortedPoints.get(i), point) == 0; i--) {
-				swapBackOne(i, sortedPoints);
-			}
+			int index = findCorrectIndex(point, sortedPoints);
+			sortedPoints.add(index, point);
 		}
-		return null;
+		return sortedPoints;
 	}
 	
-	private void swapBackOne(int i, List<Point> sortedPoints) {
-		if(i == 0) return;
-		Point temp = sortedPoints.get(i-1);
-		sortedPoints.set(i-1, sortedPoints.get(i));
-		sortedPoints.set(i, temp);
+	private int findCorrectIndex(Point point, List<Point> sortedPoints) {
+		for(int i=0; i<sortedPoints.size(); i++) {
+			if(point.compareTo(sortedPoints.get(i)) <= 0) {
+				return i;
+			}
+		}
+		return 0;
 	}
 
 	/**

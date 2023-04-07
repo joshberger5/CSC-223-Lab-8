@@ -22,22 +22,19 @@ class PreprocessorTest
 	@Test
 	void test_implicit_crossings()
 	{
-		                                 // TODO: Update this file path for your particular project
 		FigureNode fig = InputFacade.extractFigure("fully_connected_irregular_polygon.json");
 
 		Map.Entry<PointDatabase, Set<Segment>> pair = InputFacade.toGeometryRepresentation(fig);
 
 		PointDatabase points = pair.getKey();
-
+		
 		Set<Segment> segments = pair.getValue();
-
+		
 		Preprocessor pp = new Preprocessor(points, segments);
 
 		// 5 new implied points inside the pentagon
 		Set<Point> iPoints = ImplicitPointPreprocessor.compute(points, new ArrayList<Segment>(segments));
 		assertEquals(5, iPoints.size());
-
-		System.out.println(iPoints);
 
 		//
 		//
@@ -68,7 +65,9 @@ class PreprocessorTest
 		//
 		Set<Segment> iSegments = pp.computeImplicitBaseSegments(iPoints);
 		assertEquals(15, iSegments.size());
-
+		for(Segment seg: iSegments) {
+			System.out.println(seg.getPoint1() + " -- " + seg.getPoint2());
+		}
 		List<Segment> expectedISegments = new ArrayList<Segment>();
 
 		expectedISegments.add(new Segment(points.getPoint("A"), c_star));
