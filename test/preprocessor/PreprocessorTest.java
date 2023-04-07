@@ -65,9 +65,7 @@ class PreprocessorTest
 		//
 		Set<Segment> iSegments = pp.computeImplicitBaseSegments(iPoints);
 		assertEquals(15, iSegments.size());
-		for(Segment seg: iSegments) {
-			System.out.println(seg.getPoint1() + " -- " + seg.getPoint2());
-		}
+		
 		List<Segment> expectedISegments = new ArrayList<Segment>();
 
 		expectedISegments.add(new Segment(points.getPoint("A"), c_star));
