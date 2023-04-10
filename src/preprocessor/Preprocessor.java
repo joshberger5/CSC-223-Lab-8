@@ -108,16 +108,27 @@ public class Preprocessor
 	 */
 	private Set<Segment> computeImplicitSegmentBreaksIfExists(Segment segment, Set<Point> implicitPoints) {
 		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+		Set<Point> midPoints = getMidPoints(segment, implicitPoints);
+		if(midPoints.size() != 0) {
+			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
+		}
+		return implicitSegments;
+	}
+
+	/**
+	 * gets all the point from a set that are midpoints for a specified segment
+	 * @param segment
+	 * @param implicitPoints
+	 * @return the midpoints
+	 */
+	private Set<Point> getMidPoints(Segment segment, Set<Point> implicitPoints) {
 		Set<Point> midPoints = new LinkedHashSet<Point>();
 		for(Point point : implicitPoints) {
 			if(segment.pointLiesBetweenEndpoints(point)) {
 				midPoints.add(point);
 			}
 		}
-		if(midPoints.size() != 0) {
-			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
-		}
-		return implicitSegments;
+		return midPoints;
 	}
 
 	/**
@@ -132,11 +143,9 @@ public class Preprocessor
 		points.add(segment.getPoint1());
 		points.add(segment.getPoint2());
 		points.sort(Comparator.naturalOrder());
-		
 		for(int i=0; i<points.size()-1; i++) {
 			implicitSegments.add(new Segment(points.get(i), points.get(i+1)));
 		}
-		
 		return implicitSegments;
 	}
 	
@@ -195,16 +204,26 @@ public class Preprocessor
 	 */
 	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
 		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
-		
 		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(allMinimalSegments);
 		for(ArrayList<Segment> group: groupedSegments) {
-			for(int i=0; i<group.size()-1; i++) {
-				for(int j=i+1; j<group.size(); j++) {
-					nonMinimalSegments.add(mergeSegments(group.get(i), group.get(j)));
-				}
-			}
+			nonMinimalSegments.addAll(mergeGroup(group));
 		}
 		return nonMinimalSegments;
+	}
+
+	/**
+	 * merges all of the segments in the group
+	 * @param group
+	 * @return the merge group
+	 */
+	private Set<Segment> mergeGroup(ArrayList<Segment> group) {
+		Set<Segment> mergeGroup = new LinkedHashSet<Segment>();
+		for(int i=0; i<group.size()-1; i++) {
+			for(int j=i+1; j<group.size(); j++) {
+				mergeGroup.add(mergeSegments(group.get(i), group.get(j)));
+			}
+		}
+		return mergeGroup;
 	}
 
 	/**
