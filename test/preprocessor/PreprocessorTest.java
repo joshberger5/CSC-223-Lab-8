@@ -126,25 +126,26 @@ class PreprocessorTest
 		// Ensure we have ALL minimal segments: 20 in this figure.
 		//
 		List<Segment> expectedNonMinimalSegments = new ArrayList<Segment>();
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), d_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("D"), c_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("D")));
 		
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), c_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("E"), b_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), points.getPoint("E")));
-		
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), d_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("E"), e_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), points.getPoint("E")));		
-
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), a_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), b_star));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("C")));
-		
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), e_star));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("D"), a_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("D")));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), a_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), d_star));
+
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), points.getPoint("E")));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), points.getPoint("D")));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), c_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), e_star));
+
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), points.getPoint("E")));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), b_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("C"), d_star));
+		
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("D"), a_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("D"), c_star));
+
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("E"), b_star));
+		expectedNonMinimalSegments.add(new Segment(points.getPoint("E"), e_star));
 		
 		//
 		// Check size and content equality

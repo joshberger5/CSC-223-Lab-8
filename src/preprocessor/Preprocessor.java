@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import geometry_objects.points.Point;
 import geometry_objects.points.PointDatabase;
 import preprocessor.delegates.ImplicitPointPreprocessor;
+import utilities.math.MathUtilities;
 import geometry_objects.Segment;
 
 public class Preprocessor
@@ -120,10 +121,10 @@ public class Preprocessor
 	}
 
 	/**
-	 * splits a specified segment on a specified point and adds to the implicit segments
+	 * splits a specified segment on specified points
 	 * @param segment
 	 * @param midPoints
-	 * @return set of two broken down segments
+	 * @return set of broken down segments
 	 */
 	private Set<Segment> breakSegmentOnPoints(Segment segment, Set<Point> midPoints) {
 		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
@@ -137,6 +138,21 @@ public class Preprocessor
 		}
 		
 		return implicitSegments;
+	}
+	
+	/**
+	 * merges specified segments together.
+	 * @param segments
+	 * @return merged segment
+	 */
+	private Segment mergeSegments(Segment segment1, Segment segment2) {
+		List<Point> points = new ArrayList<Point>();
+		points.add(segment1.getPoint1());
+		points.add(segment1.getPoint2());
+		points.add(segment2.getPoint1());
+		points.add(segment2.getPoint2());
+		points.sort(Comparator.naturalOrder());
+		return new Segment(points.get(0), points.get(points.size()-1));
 	}
 
 	/**
@@ -153,7 +169,7 @@ public class Preprocessor
 				allMinimalSegments.add(segment);
 			}
 		}
-		allMinimalSegments.addAll(_implicitSegments);
+		allMinimalSegments.addAll(implicitSegments);
 		return allMinimalSegments;
 	}
 
@@ -179,11 +195,57 @@ public class Preprocessor
 	 */
 	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
 		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
-		for (Segment segment: _givenSegments) {
-			if (!allMinimalSegments.contains(segment)) {
-				nonMinimalSegments.add(segment);
+		
+		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(allMinimalSegments);
+		for(ArrayList<Segment> group: groupedSegments) {
+			for(int i=0; i<group.size()-1; i++) {
+				for(int j=i+1; j<group.size(); j++) {
+					nonMinimalSegments.add(mergeSegments(group.get(i), group.get(j)));
+				}
 			}
 		}
 		return nonMinimalSegments;
+	}
+
+	/**
+	 * groups segments in to bins such that each group has the same slope and is contiguous
+	 * @param allMinimalSegments
+	 * @return grouped segments
+	 */
+	private ArrayList<ArrayList<Segment>> contructGroupedSegments(Set<Segment> allMinimalSegments) {
+		ArrayList<ArrayList<Segment>> groupedSegments = new ArrayList<ArrayList<Segment>>();
+		for(Segment segment: allMinimalSegments) {
+			int belongsTo = getBelongingGroup(segment, groupedSegments);
+			if(belongsTo >= 0) {
+				groupedSegments.get(belongsTo).add(segment);
+			}
+			else {
+				ArrayList<Segment> newGroup = new ArrayList<Segment>();
+				newGroup.add(segment);
+				groupedSegments.add(newGroup);
+			}
+		}
+		return groupedSegments;
+	}
+
+	/**
+	 * gets the segment group that the segment belongs in.
+	 * A segment belongs in a group if it has the same slope as the rest of the group
+	 * and shares a vertex with at least one group member.
+	 * @param segment
+	 * @param groupedSegments
+	 * @return the proper group or -1
+	 */
+	private int getBelongingGroup(Segment segment, ArrayList<ArrayList<Segment>> groupedSegments) {
+		for(int i=0; i<groupedSegments.size(); i++) {
+			ArrayList<Segment> group = groupedSegments.get(i);
+			if(MathUtilities.doubleEquals(group.get(0).slope(), segment.slope())) {
+				for(Segment other: group) {
+					if(segment.sharedVertex(other) != null)
+						return i;
+				}
+			}
+		}
+		return -1;
 	}
 }
