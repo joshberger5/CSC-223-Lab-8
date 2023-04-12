@@ -50,16 +50,16 @@ public class Preprocessor
 	public Preprocessor(PointDatabase points, Set<Segment> segments)
 	{
 		_pointDatabase  = points;
-		
+
 		_givenSegments = segments;
-		
+
 		_implicitPoints = new LinkedHashSet<Point>();
 		_implicitSegments = new LinkedHashSet<Segment>();
 		_allMinimalSegments = new LinkedHashSet<Segment>();
 		_nonMinimalSegments = new LinkedHashSet<Segment>();
-		
+
 		_segmentDatabase = new HashMap<Segment, Segment>();
-		
+
 		analyze();
 	}
 
@@ -70,7 +70,7 @@ public class Preprocessor
 	{
 		// Implicit Points
 		_implicitPoints = ImplicitPointPreprocessor.compute(_pointDatabase, _givenSegments.stream().toList());
-		
+
 		// Implicit Segments attributed to implicit points
 		_implicitSegments = computeImplicitBaseSegments(_implicitPoints);
 
@@ -85,34 +85,6 @@ public class Preprocessor
 		// Combine minimal and non-minimal into one package: our database
 		_allMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
 		_nonMinimalSegments.forEach((segment) -> _segmentDatabase.put(segment, segment));
-	}
-
-	/**
-	 * computes the set of all implicit segments
-	 * @param implicitPoints
-	 * @return the set of implicit segments
-	 */
-	protected Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
-		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
-		for(Segment segment: _givenSegments) {
-			implicitSegments.addAll(computeImplicitSegmentBreaksIfExists(segment, implicitPoints));
-		}
-		return implicitSegments;
-	}
-
-	/**
-	 * finds and splits a given segment on an overlapping point if one exists
-	 * @param segment
-	 * @param implicitPoints
-	 * @return set from broken down segment
-	 */
-	private Set<Segment> computeImplicitSegmentBreaksIfExists(Segment segment, Set<Point> implicitPoints) {
-		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
-		Set<Point> midPoints = getMidPoints(segment, implicitPoints);
-		if(midPoints.size() != 0) {
-			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
-		}
-		return implicitSegments;
 	}
 
 	/**
@@ -148,22 +120,50 @@ public class Preprocessor
 		}
 		return implicitSegments;
 	}
-	
+
 	/**
-	 * merges specified segments together.
-	 * @param segment1
-	 * @param segment2
-	 * @return merged segment
+	 * finds and splits a given segment on an overlapping point if one exists
+	 * @param segment
+	 * @param implicitPoints
+	 * @return set from broken down segment
 	 */
-	private Segment mergeSegments(Segment segment1, Segment segment2) {
-		List<Point> points = new ArrayList<Point>();
-		points.add(segment1.getPoint1());
-		points.add(segment1.getPoint2());
-		points.add(segment2.getPoint1());
-		points.add(segment2.getPoint2());
-		points.sort(Comparator.naturalOrder());
-		return new Segment(points.get(0), points.get(points.size()-1));
+	private Set<Segment> computeImplicitSegmentBreaksIfExists(Segment segment, Set<Point> implicitPoints) {
+		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+		Set<Point> midPoints = getMidPoints(segment, implicitPoints);
+		if(midPoints.size() != 0) {
+			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
+		}
+		return implicitSegments;
 	}
+
+	/**
+	 * computes the set of all implicit segments
+	 * @param implicitPoints
+	 * @return the set of implicit segments
+	 */
+	protected Set<Segment> computeImplicitBaseSegments(Set<Point> implicitPoints) {
+		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
+		for(Segment segment: _givenSegments) {
+			implicitSegments.addAll(computeImplicitSegmentBreaksIfExists(segment, implicitPoints));
+		}
+		return implicitSegments;
+	}
+
+	/**
+	 * determines whether is segment has a point that lies between its end points
+	 * @param segment
+	 * @param implicitPoints
+	 * @return whether the segment is minimal
+	 */
+	private boolean isMinimal(Segment segment, Set<Point> implicitPoints) {
+		for (Point point : implicitPoints) {
+			if (segment.pointLiesBetweenEndpoints(point)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 	/**
 	 * finds the set of all minimal segments
@@ -184,47 +184,24 @@ public class Preprocessor
 	}
 
 	/**
-	 * determines whether is segment has a point that lies between its end points
+	 * gets the segment group that the segment belongs in.
+	 * A segment belongs in a group if it has the same slope as the rest of the group
+	 * and shares a vertex with at least one group member.
 	 * @param segment
-	 * @param implicitPoints
-	 * @return whether the segment is minimal
+	 * @param groupedSegments
+	 * @return the proper group or -1
 	 */
-	private boolean isMinimal(Segment segment, Set<Point> implicitPoints) {
-		for (Point point : implicitPoints) {
-			if (segment.pointLiesBetweenEndpoints(point)) {
-				return false;
+	private int getBelongingGroup(Segment segment, ArrayList<ArrayList<Segment>> groupedSegments) {
+		for(int i=0; i<groupedSegments.size(); i++) {
+			ArrayList<Segment> group = groupedSegments.get(i);
+			if(MathUtilities.doubleEquals(group.get(0).slope(), segment.slope())) {
+				for(Segment other: group) {
+					if(segment.sharedVertex(other) != null)
+						return i;
+				}
 			}
 		}
-		return true;
-	}
-	
-	/**
-	 * Constructs the set of non-minimal segments
-	 * @param allMinimalSegments
-	 * @return set of non-minimal segments
-	 */
-	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
-		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
-		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(allMinimalSegments);
-		for(ArrayList<Segment> group: groupedSegments) {
-			nonMinimalSegments.addAll(mergeGroup(group));
-		}
-		return nonMinimalSegments;
-	}
-
-	/**
-	 * merges all pairs of the segments in the group
-	 * @param group
-	 * @return the merge group
-	 */
-	private Set<Segment> mergeGroup(ArrayList<Segment> group) {
-		Set<Segment> mergeGroup = new LinkedHashSet<Segment>();
-		for(int i=0; i<group.size()-1; i++) {
-			for(int j=i+1; j<group.size(); j++) {
-				mergeGroup.add(mergeSegments(group.get(i), group.get(j)));
-			}
-		}
-		return mergeGroup;
+		return -1;
 	}
 
 	/**
@@ -249,23 +226,47 @@ public class Preprocessor
 	}
 
 	/**
-	 * gets the segment group that the segment belongs in.
-	 * A segment belongs in a group if it has the same slope as the rest of the group
-	 * and shares a vertex with at least one group member.
-	 * @param segment
-	 * @param groupedSegments
-	 * @return the proper group or -1
+	 * merges specified segments together.
+	 * @param segment1
+	 * @param segment2
+	 * @return merged segment
 	 */
-	private int getBelongingGroup(Segment segment, ArrayList<ArrayList<Segment>> groupedSegments) {
-		for(int i=0; i<groupedSegments.size(); i++) {
-			ArrayList<Segment> group = groupedSegments.get(i);
-			if(MathUtilities.doubleEquals(group.get(0).slope(), segment.slope())) {
-				for(Segment other: group) {
-					if(segment.sharedVertex(other) != null)
-						return i;
-				}
+	private Segment mergeSegments(Segment segment1, Segment segment2) {
+		List<Point> points = new ArrayList<Point>();
+		points.add(segment1.getPoint1());
+		points.add(segment1.getPoint2());
+		points.add(segment2.getPoint1());
+		points.add(segment2.getPoint2());
+		points.sort(Comparator.naturalOrder());
+		return new Segment(points.get(0), points.get(points.size()-1));
+	}
+
+	/**
+	 * merges all pairs of the segments in the group
+	 * @param group
+	 * @return the merge group
+	 */
+	private Set<Segment> mergeGroup(ArrayList<Segment> group) {
+		Set<Segment> mergeGroup = new LinkedHashSet<Segment>();
+		for(int i=0; i<group.size()-1; i++) {
+			for(int j=i+1; j<group.size(); j++) {
+				mergeGroup.add(mergeSegments(group.get(i), group.get(j)));
 			}
 		}
-		return -1;
+		return mergeGroup;
+	}
+
+	/**
+	 * Constructs the set of non-minimal segments
+	 * @param allMinimalSegments
+	 * @return set of non-minimal segments
+	 */
+	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
+		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
+		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(allMinimalSegments);
+		for(ArrayList<Segment> group: groupedSegments) {
+			nonMinimalSegments.addAll(mergeGroup(group));
+		}
+		return nonMinimalSegments;
 	}
 }
