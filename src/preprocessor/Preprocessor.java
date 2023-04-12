@@ -213,7 +213,7 @@ public class Preprocessor
 	}
 
 	/**
-	 * merges all of the segments in the group
+	 * merges all pairs of the segments in the group
 	 * @param group
 	 * @return the merge group
 	 */
