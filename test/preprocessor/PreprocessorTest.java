@@ -272,19 +272,18 @@ class PreprocessorTest
 		// Construct ALL figure segments from the base segments
 		//
 		Set<Segment> computedNonMinimalSegments = pp.constructAllNonMinimalSegments(minimalSegments);
+		
+		//
+		// All Segments will consist of the new 10 non-minimal segments.
+		//
+		assertEquals(10, computedNonMinimalSegments.size());
 
 		//
-		// All Segments will consist of the new 11 non-minimal segments.
-		//
-		assertEquals(11, computedNonMinimalSegments.size());
-
-		//
-		// Ensure we have ALL non-minimal segments: 11 in this figure.
+		// Ensure we have ALL non-minimal segments: 10 in this figure.
 		//
 		List<Segment> expectedNonMinimalSegments = new ArrayList<Segment>();
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("C")));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("D")));
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("C")));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("E")));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("F")));
 		expectedNonMinimalSegments.add(new Segment(points.getPoint("B"), points.getPoint("D")));

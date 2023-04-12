@@ -180,6 +180,50 @@ public class Preprocessor
 		allMinimalSegments.addAll(implicitSegments);
 		return allMinimalSegments;
 	}
+	
+	/**
+	 * gets the midpoint for a segment
+	 * @param segment
+	 * @return the midpoint
+	 */
+	private Point getMidpoint(Segment segment) {
+		Point point1 = segment.getPoint1();
+		Point point2 = segment.getPoint2();
+		double avrX = (point1.getX() + point2.getX()) / 2;
+		double avrY = (point1.getY() + point2.getY()) / 2;
+		return new Point(avrX, avrY);
+	}
+	
+	/**
+	 * gets the midpoints for a of the segments associated with the segment
+	 * @param allMinimalSegments
+	 * @return a mapping from midpoint to segment
+	 */
+	private Map<Point, Segment> getMidPointsAssociatedWithSegments(Set<Segment> allMinimalSegments) {
+		Map<Point, Segment> SegmentMidPoints = new HashMap<Point, Segment>();
+		for(Segment segment: allMinimalSegments) {
+			SegmentMidPoints.put(getMidpoint(segment), segment);
+		}
+		return SegmentMidPoints;
+	}
+	
+	/**
+	 * Sorts the segments based on their midpoints
+	 * @param allMinimalSegments
+	 * @return list of sorted segments
+	 */
+	private List<Segment> sortSegments(Set<Segment> allMinimalSegments) {
+		List<Segment> sortedSegment = new ArrayList<Segment>();
+		Map<Point, Segment> SegmentMidPoints = getMidPointsAssociatedWithSegments(allMinimalSegments);
+		List<Point> midPoints = new ArrayList<Point>(SegmentMidPoints.keySet());
+		
+		midPoints.sort(Comparator.naturalOrder());
+		
+		for(Point midPoint: midPoints) {
+			sortedSegment.add(SegmentMidPoints.get(midPoint));
+		}
+		return sortedSegment;
+	}
 
 	/**
 	 * gets the segment group that the segment belongs in.
@@ -204,12 +248,12 @@ public class Preprocessor
 
 	/**
 	 * groups segments in to bins such that each group has the same slope and is contiguous
-	 * @param allMinimalSegments
+	 * @param sortedSegments
 	 * @return grouped segments
 	 */
-	private ArrayList<ArrayList<Segment>> contructGroupedSegments(Set<Segment> allMinimalSegments) {
+	private ArrayList<ArrayList<Segment>> contructGroupedSegments(List<Segment> sortedSegments) {
 		ArrayList<ArrayList<Segment>> groupedSegments = new ArrayList<ArrayList<Segment>>();
-		for(Segment segment: allMinimalSegments) {
+		for(Segment segment: sortedSegments) {
 			int belongsTo = getBelongingGroup(segment, groupedSegments);
 			if(belongsTo >= 0) {
 				groupedSegments.get(belongsTo).add(segment);
@@ -260,8 +304,9 @@ public class Preprocessor
 	 * @return set of non-minimal segments
 	 */
 	protected Set<Segment> constructAllNonMinimalSegments(Set<Segment> allMinimalSegments) {
+		List<Segment> sortedSegments = sortSegments(allMinimalSegments);
 		Set<Segment> nonMinimalSegments = new LinkedHashSet<Segment>();
-		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(allMinimalSegments);
+		ArrayList<ArrayList<Segment>> groupedSegments = contructGroupedSegments(sortedSegments);
 		for(ArrayList<Segment> group: groupedSegments) {
 			nonMinimalSegments.addAll(mergeGroup(group));
 		}
