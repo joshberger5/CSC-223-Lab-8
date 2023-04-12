@@ -1,0 +1,30 @@
+//    A----C-----B
+{
+  "Figure" :
+  {
+    "Description" : "A sequence of collinear line segments mimicking one line with 6 points.",
+    "Points" :
+	  [
+	    {
+	      "name" : "A",
+		  "x" : 0,
+   	      "y" : 0
+		},
+	    {
+	      "name" : "C",
+		  "x" : 1,
+   	      "y" : 0
+		},
+	    {
+	      "name" : "B",
+		  "x" : 2,
+   	      "y" : 0
+		}
+	  ],
+  
+    "Segments" :
+      [
+	    {"A" : ["B"] }
+      ]
+  }
+}
