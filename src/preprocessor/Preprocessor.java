@@ -87,7 +87,7 @@ public class Preprocessor
 	}
 
 	/**
-	 * gets all the point from a set that are midpoints for a specified segment
+	 * gets all the point from a set that are intersection points for a specified segment
 	 * @param segment
 	 * @param implicitPoints
 	 * @return the midpoints
