@@ -92,7 +92,7 @@ public class Preprocessor
 	 * @param implicitPoints
 	 * @return the midpoints
 	 */
-	private Set<Point> getMidPoints(Segment segment, Set<Point> implicitPoints) {
+	private Set<Point> getIntersectionPoints(Segment segment, Set<Point> implicitPoints) {
 		Set<Point> midPoints = new LinkedHashSet<Point>();
 		for(Point point : implicitPoints) {
 			if(segment.pointLiesBetweenEndpoints(point)) {
@@ -128,7 +128,7 @@ public class Preprocessor
 	 */
 	private Set<Segment> computeImplicitSegmentBreaksIfExists(Segment segment, Set<Point> implicitPoints) {
 		Set<Segment> implicitSegments = new LinkedHashSet<Segment>();
-		Set<Point> midPoints = getMidPoints(segment, implicitPoints);
+		Set<Point> midPoints = getIntersectionPoints(segment, implicitPoints);
 		if(midPoints.size() != 0) {
 			implicitSegments.addAll(breakSegmentOnPoints(segment, midPoints));
 		}
