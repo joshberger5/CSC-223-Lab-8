@@ -50,16 +50,15 @@ public class Preprocessor
 	public Preprocessor(PointDatabase points, Set<Segment> segments)
 	{
 		_pointDatabase  = points;
-
 		_givenSegments = segments;
-
+		
+		_segmentDatabase = new HashMap<Segment, Segment>();
+		
 		_implicitPoints = new LinkedHashSet<Point>();
 		_implicitSegments = new LinkedHashSet<Segment>();
 		_allMinimalSegments = new LinkedHashSet<Segment>();
 		_nonMinimalSegments = new LinkedHashSet<Segment>();
-
-		_segmentDatabase = new HashMap<Segment, Segment>();
-
+		
 		analyze();
 	}
 
@@ -163,7 +162,6 @@ public class Preprocessor
 		}
 		return true;
 	}
-
 
 	/**
 	 * finds the set of all minimal segments
