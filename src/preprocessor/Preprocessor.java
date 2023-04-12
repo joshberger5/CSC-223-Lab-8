@@ -151,7 +151,8 @@ public class Preprocessor
 	
 	/**
 	 * merges specified segments together.
-	 * @param segments
+	 * @param segment1
+	 * @param segment2
 	 * @return merged segment
 	 */
 	private Segment mergeSegments(Segment segment1, Segment segment2) {
