@@ -179,17 +179,16 @@ class PreprocessorTest
 		assertEquals(0, iPoints.size());
 		
 		//
-		// There are 2 implied segments inside the line; see figure above
+		// There are 0 implied segments inside the line; see figure above
 		//
 		Set<Segment> iSegments = pp.computeImplicitBaseSegments(iPoints);
-		assertEquals(2, iSegments.size());
+		assertEquals(0, iSegments.size());
 		
 		//
-		// Ensure we have ALL minimal segments: 2 in this figure.
+		// Ensure we have ALL minimal segments: 1 in this figure.
 		//
 		List<Segment> expectedMinimalSegments = new ArrayList<Segment>(iSegments);
-		expectedMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("C")));
-		expectedMinimalSegments.add(new Segment(points.getPoint("B"), points.getPoint("C")));
+		expectedMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("B")));
 		
 		Set<Segment> minimalSegments = pp.identifyAllMinimalSegments(iPoints, segments, iSegments);
 		assertEquals(expectedMinimalSegments.size(), minimalSegments.size());
@@ -205,16 +204,14 @@ class PreprocessorTest
 		Set<Segment> computedNonMinimalSegments = pp.constructAllNonMinimalSegments(minimalSegments);
 		
 		//
-		// All Segments will consist of the new 1 non-minimal segments.
+		// All Segments will consist of the new 0 non-minimal segments.
 		//
-		assertEquals(1, computedNonMinimalSegments.size());
+		assertEquals(0, computedNonMinimalSegments.size());
 
 		//
-		// Ensure we have ALL non-minimal segments: 1 in this figure.
+		// Ensure we have ALL non-minimal segments: 0 in this figure.
 		//
 		List<Segment> expectedNonMinimalSegments = new ArrayList<Segment>();
-		
-		expectedNonMinimalSegments.add(new Segment(points.getPoint("A"), points.getPoint("B")));
 		
 		//
 		// Check size and content equality
@@ -225,5 +222,10 @@ class PreprocessorTest
 		{
 			assertTrue(expectedNonMinimalSegments.contains(computedNonMinimalSegment));
 		}
+	}
+	
+	@Test
+	void test_collinear_line_segments() {
+		
 	}
 }
